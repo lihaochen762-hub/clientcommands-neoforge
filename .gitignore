@@ -1,0 +1,23 @@
+# gradle
+.gradle/
+build/
+out/
+
+# idea
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# vscode
+.settings/
+.vscode/
+bin/
+.classpath
+.project
+
+# minecraft
+run/
+logs/
+
+.DS_Store

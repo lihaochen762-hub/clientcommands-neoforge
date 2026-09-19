@@ -1,0 +1,159 @@
+plugins {
+	id 'dev.architectury.loom-no-remap' version "${loom_version}"
+	id 'maven-publish'
+}
+
+base {
+	archivesName = project.archives_base_name
+	version = project.mod_version
+	group = project.maven_group
+}
+
+repositories {
+	maven {
+		name = 'Fabric'
+		url = 'https://maven.fabricmc.net/'
+	}
+	maven {
+		name = 'Architectury'
+		url = 'https://maven.architectury.dev/'
+	}
+	maven {
+		name = 'NeoForge'
+		url = 'https://maven.neoforged.net/releases/'
+	}
+	maven {
+		name = 'ForgifiedFabricApi'
+		url = 'https://maven.su5ed.dev/releases'
+	}
+	maven {
+		name = 'Foxified'
+		url = 'https://maven.kessokuteatime.work/snapshots'
+	}
+	maven {
+		name = 'Xpple'
+		url = 'https://maven.xpple.dev/maven2'
+	}
+	maven {
+		name = 'Seedfinding'
+		url = 'https://maven.seedfinding.com'
+	}
+	maven {
+		name = 'Lattice'
+		url = 'https://maven.latticg.com'
+	}
+	mavenCentral()
+}
+
+configurations {
+	// Plain java libraries whose classes are merged into the mod jar
+	includedLibrary
+	implementation.extendsFrom includedLibrary
+
+	// Fabric-only mods which are embedded into this mod (their classes are merged in,
+	// their entrypoints are called from our NeoForge mod entrypoint)
+	embeddedMod
+	implementation.extendsFrom embeddedMod
+
+	// Fabric Loader API implementation, merged into the mod jar
+	shadedLibrary
+	implementation.extendsFrom shadedLibrary
+}
+
+loom {
+	accessWidenerPath = file('src/main/resources/clientcommands.aw')
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	neoForge "net.neoforged:neoforge:${project.neoforge_version}"
+
+	shadedLibrary("org.sinytra:forgified-fabric-loader:${project.forgified_loader_version}") { transitive = false }
+
+	// Fabric API surface for NeoForge
+	include(implementation("org.sinytra.forgified-fabric-api:fabric-api-base:${project.ffapi_api_base}")) { transitive = false }
+	include(implementation("org.sinytra.forgified-fabric-api:fabric-command-api-v2:${project.ffapi_command_api_v2}")) { transitive = false }
+	include(implementation("team.cagayakegirls.foxified:foxified-networking-api:${project.foxified_networking_api_version}")) { transitive = false }
+	include(implementation("org.sinytra.forgified-fabric-api:fabric-transitive-access-wideners-v1:${project.ffapi_transitive_access_wideners_v1}")) { transitive = false }
+
+	compileOnly 'com.demonwav.mcdev:annotations:2.0.0'
+
+	embeddedMod("dev.xpple:clientarguments:${project.clientarguments_version}") { transitive = false }
+	embeddedMod("dev.xpple:betterconfig-fabric:${project.betterconfig_version}") { transitive = false }
+	embeddedMod("dev.xpple:simplewaypoints:${project.simplewaypoints_version}") { transitive = false }
+
+	includedLibrary "com.seedfinding:mc_feature:${project.seedfinding_feature_version}"
+	includedLibrary "com.seedfinding:mc_biome:${project.seedfinding_biome_version}"
+	includedLibrary "com.seedfinding:mc_core:${project.seedfinding_core_version}"
+	includedLibrary "com.seedfinding:mc_seed:${project.seedfinding_seed_version}"
+	includedLibrary "com.seedfinding:latticg:${project.latticg_version}:rt"
+}
+
+def generateBuildInfo = tasks.register('generateBuildInfo') {
+	def outputFile = new File(temporaryDir, 'build_info.json')
+	outputs.file(outputFile)
+	outputs.upToDateWhen { false }
+	doLast {
+		def git = { List<String> args ->
+			try {
+				def process = new ProcessBuilder(['git'] + args).directory(projectDir).redirectErrorStream(false).start()
+				def output = process.inputStream.getText('UTF-8').trim()
+				process.waitFor()
+				return output
+			} catch (Exception e) {
+				return 'unknown'
+			}
+		}
+		def json = [
+			version        : project.version.toString(),
+			branch         : git(['branch', '--show-current']),
+			shortCommitHash: git(['rev-parse', '--short', 'HEAD']),
+			commitHash     : git(['rev-parse', 'HEAD'])
+		]
+		outputFile.text = groovy.json.JsonOutput.toJson(json) + '\n'
+	}
+}
+
+processResources {
+	from generateBuildInfo
+
+	// The embedded Fabric-only libraries and the plain java libraries are merged into the mod's
+	// own resources so that they are available both in the development environment and in the
+	// built jar.
+	from({ configurations.embeddedMod.collect { zipTree(it) } }) {
+		exclude 'fabric.mod.json'
+		exclude 'META-INF/MANIFEST.MF'
+		exclude 'META-INF/jars/**'
+		exclude 'build_info.json'
+	}
+	from({ configurations.includedLibrary.collect { it.isDirectory() ? it : zipTree(it) } }) {
+		include 'com/seedfinding/**'
+	}
+	from({ configurations.shadedLibrary.collect { zipTree(it) } }) {
+		exclude 'META-INF/**'
+	}
+	duplicatesStrategy DuplicatesStrategy.WARN
+}
+
+jar {
+	from('LICENSE')
+	duplicatesStrategy DuplicatesStrategy.WARN
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.encoding = 'UTF-8'
+	options.release = 25
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			artifact jar
+		}
+	}
+}

@@ -1,0 +1,55 @@
+modLoader = "javafml"
+loaderVersion = "[10,)"
+license = "LGPL-3.0-or-later"
+issueTrackerURL = "https://github.com/Earthcomputer/clientcommands/issues"
+
+[[mods]]
+modId = "clientcommands"
+version = "2.15.1"
+displayName = "Client Commands"
+displayURL = "https://earthcomputer.net/"
+logoFile = "assets/clientcommands/icon.png"
+authors = "Earthcomputer"
+credits = "cortex, haykam, xpple"
+description = '''
+Useful client-side commands.
+'''
+
+# The Forgified Fabric API rendering module needs the Fabric lifecycle events API, but the
+# Forgified Fabric API lifecycle module cannot run on Minecraft 26.2 (its mixins no longer match
+# the vanilla code). The part that is needed is implemented by this mod instead, so the mod id is
+# provided here.
+[[mods]]
+modId = "fabric_lifecycle_events_v1"
+version = "4.1.1+150d8dbd4c"
+displayName = "Fabric Lifecycle Events (v1) (NeoForge shim)"
+authors = "clientcommands NeoForge port"
+description = '''
+Minimal NeoForge implementation of Fabric API's client lifecycle events.
+'''
+
+[[mixins]]
+config = "mixins.clientcommands.json"
+
+[[mixins]]
+config = "betterconfig.mixins.json"
+
+[[mixins]]
+config = "betterconfig.mixins.client.json"
+
+[[mixins]]
+config = "mixins.simplewaypoints.json"
+
+[[dependencies.clientcommands]]
+modId = "neoforge"
+type = "required"
+versionRange = "[26.2,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.clientcommands]]
+modId = "minecraft"
+type = "required"
+versionRange = "[26.2,26.3)"
+ordering = "NONE"
+side = "BOTH"
