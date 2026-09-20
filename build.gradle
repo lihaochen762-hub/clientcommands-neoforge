@@ -140,6 +140,7 @@ processResources {
 }
 
 jar {
+	archiveFileName = "${project.archives_base_name}-${project.mod_version}+mc${project.minecraft_version}+neoforge${project.neoforge_version}.jar"
 	from('LICENSE')
 	duplicatesStrategy DuplicatesStrategy.WARN
 }
