@@ -18,7 +18,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MushroomCowSheepAndSnowGolemMixin {
     @Definition(id = "ServerLevel", type = ServerLevel.class)
     @Expression("? instanceof ServerLevel")
-    @Inject(method = "mobInteract", at = @At("MIXINEXTRAS:EXPRESSION"))
+    // NeoForge moves the shearing logic out of Sheep#mobInteract, so this expression no longer
+    // matches there; require = 0 keeps that from being fatal while still logging it.
+    @Inject(method = "mobInteract", at = @At("MIXINEXTRAS:EXPRESSION"), require = 0)
     public void onInteract(Player player, InteractionHand hand, CallbackInfoReturnable<Boolean> ci) {
         PlayerRandCracker.onItemDamage(1, player, player.getItemInHand(hand));
     }

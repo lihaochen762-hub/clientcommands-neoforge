@@ -48,5 +48,5 @@ loader-specific layers are adapted around them.
 - Command flags are stored on the command source in place instead of on a copy, so a flag can
   persist for the rest of the session (on Fabric the source is recreated per suggestion pass).
 - `MushroomCowSheepAndSnowGolemMixin` does not match NeoForge's patched shearing code, so RNG
-  tracking for shearing/milking is inactive on those paths. `defaultRequire` in
-  `mixins.clientcommands.json` is set to 0 because of this.
+  tracking for shearing/milking is inactive on those paths. That single injection uses
+  `require = 0` so the mismatch is not fatal; every other mixin is validated strictly.

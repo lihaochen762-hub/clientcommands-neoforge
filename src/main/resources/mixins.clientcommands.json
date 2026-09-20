@@ -95,8 +95,5 @@
     "screen.GuiMixin",
     "screen.WindowMixin",
     "suggestionshook.ClientPacketListenerMixin"
-  ],
-  "injectors": {
-    "defaultRequire": 0
-  }
+  ]
 }
