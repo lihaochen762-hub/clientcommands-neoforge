@@ -43,9 +43,11 @@ loader-specific layers are adapted around them.
 
 ## Known limitations
 
-- `MushroomCowSheepAndSnowGolemMixin` does not match NeoForge's patched shearing code, so RNG
-  tracking for shearing/milking is inactive on those paths. That single injection uses
-  `require = 0` so the mismatch is not fatal; every other mixin is validated strictly.
+None known at the moment. Shearing RNG tracking is adapted for NeoForge (see
+`rngevents/MushroomCowSheepAndSnowGolemMixin`): NeoForge moves the shearing code of sheep and snow
+golems into `shear(...)`, so instead of matching the `instanceof ServerLevel` check inside
+`mobInteract` like upstream does, it hooks `mobInteract` and applies the same preconditions vanilla
+uses to decide whether shearing happens.
 
 ## Notes on the command source
 
