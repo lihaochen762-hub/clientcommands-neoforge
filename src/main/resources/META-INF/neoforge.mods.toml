@@ -5,7 +5,7 @@ issueTrackerURL = "https://github.com/Earthcomputer/clientcommands/issues"
 
 [[mods]]
 modId = "clientcommands"
-version = "2.15.1"
+version = "${version}"
 displayName = "Client Commands"
 displayURL = "https://earthcomputer.net/"
 logoFile = "assets/clientcommands/icon.png"

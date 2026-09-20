@@ -117,6 +117,10 @@ def generateBuildInfo = tasks.register('generateBuildInfo') {
 processResources {
 	from generateBuildInfo
 
+	filesMatching('META-INF/neoforge.mods.toml') {
+		expand(version: project.version)
+	}
+
 	// The embedded Fabric-only libraries and the plain java libraries are merged into the mod's
 	// own resources so that they are available both in the development environment and in the
 	// built jar.
