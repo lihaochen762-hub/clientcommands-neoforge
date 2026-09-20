@@ -43,10 +43,15 @@ loader-specific layers are adapted around them.
 
 ## Known limitations
 
-- SimpleWaypoints (and with it `/cwaypoint` and waypoint rendering) is currently disabled: it needs
-  HUD layer support that has not been ported yet.
-- Command flags are stored on the command source in place instead of on a copy, so a flag can
-  persist for the rest of the session (on Fabric the source is recreated per suggestion pass).
 - `MushroomCowSheepAndSnowGolemMixin` does not match NeoForge's patched shearing code, so RNG
   tracking for shearing/milking is inactive on those paths. That single injection uses
   `require = 0` so the mismatch is not fatal; every other mixin is validated strictly.
+
+## Notes on the command source
+
+On Fabric the client command source is the vanilla `ClientSuggestionProvider`, and the command flag
+and alias state of this mod is mixed into it. On NeoForge the Forgified Fabric API passes its own
+`ClientCommandSourceStack`, so `mixin/compat/ClientCommandSourceStackMixin` adds the same state to
+that class. It sets flags on the source in place rather than returning a copy; this is equivalent
+here because NeoForge creates a fresh `ClientCommandSourceStack` for every command execution and
+every completion request, so flags cannot leak between commands.
