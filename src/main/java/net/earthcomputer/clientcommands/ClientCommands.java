@@ -81,10 +81,8 @@ public class ClientCommands implements ClientModInitializer {
             }
         });
 
-        // SimpleWaypoints is not initialised on NeoForge yet: it needs Fabric API classes which
-        // the Forgified Fabric API rendering module does not provide for Minecraft 26.2.
-        // Waypoints.migrateWaypoints();
-        // SimpleWaypointsAPI.getInstance().registerCommandAlias("cwaypoint");
+        Waypoints.migrateWaypoints();
+        SimpleWaypointsAPI.getInstance().registerCommandAlias("cwaypoint");
 
         // Registration
         PayloadTypeRegistry.serverboundPlay().register(CommandExecutionCustomPayload.TYPE, CommandExecutionCustomPayload.CODEC);

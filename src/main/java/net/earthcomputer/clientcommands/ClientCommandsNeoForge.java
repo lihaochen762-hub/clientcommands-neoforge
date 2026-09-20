@@ -5,13 +5,16 @@ import dev.xpple.betterconfig.BetterConfigClient;
 import dev.xpple.clientarguments.ClientArguments;
 import net.earthcomputer.clientcommands.server.ClientCommandsServer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.minecraft.client.Minecraft;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import dev.xpple.simplewaypoints.SimpleWaypoints;
 
 /**
  * NeoForge entry point.
@@ -29,7 +32,9 @@ public class ClientCommandsNeoForge {
         if (FMLEnvironment.getDist().isClient()) {
             new ClientArguments().onInitializeClient();
             new BetterConfigClient().onInitializeClient();
+            new SimpleWaypoints().onInitializeClient();
             ClientCommands.initClient();
+            modBus.addListener(RegisterGuiLayersEvent.class, HudElementRegistry::registerLayers);
             modBus.addListener(FMLClientSetupEvent.class, event -> ClientCommands.setupScrambleWindowTitle());
             // Fabric fires CLIENT_STARTED once the client's main loop is running. The closest
             // NeoForge equivalent is the first client tick.
